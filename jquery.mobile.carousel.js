@@ -18,12 +18,34 @@
             beforeStart: function(){},
             afterStart: function(){},
             beforeStop: function(){},
-            afterStop: function(){}
+            afterStop: function(){},
+            onShowPage: function(){}
         };
 
         $.extend(settings, options || {});
 
-        return this.each(function() {
+        this.getPageIndex = function () {
+            if (this.length > 0) return this[0].getPageIndex();
+            return null;
+        }
+
+        this.getPageCount = function () {
+            if (this.length > 0) return this[0].getPageCount();
+            return null;
+        }
+
+        this.flipForward = function () {
+            if (this.length > 0) this[0].flipForward();
+            return;
+        }
+
+        this.flipBackward = function () {
+            if (this.length > 0) this[0].flipBackward();
+            return;
+        }
+
+
+        return this.each(function () {
             if (this.tagName.toLowerCase() != "ul") return;
 
             var originalList = $(this);
@@ -48,6 +70,20 @@
                             .html($(this).html());
                     list.append(li);
                 });
+
+                function scrollLeft() {
+                    var new_width = -1 * width * currentPage;
+                    list.animate({ left: new_width }, settings.duration);
+                    currentPage++;
+                    settings.onShowPage();
+                }
+
+                function scrollRight() {
+                    var new_width = -1 * width * (currentPage - 1);
+                    list.animate({ left: -1 * width * (currentPage - 2) }, settings.duration);
+                    currentPage--;
+                    settings.onShowPage();
+                }
 
                 list.draggable({
                     axis: "x",
@@ -76,9 +112,9 @@
                                 list.animate({ left: "+=" + dragDelta()}, settings.duration);
                                 return;
                             }
-                            var new_width = -1 * width * currentPage;
-                            list.animate({ left: new_width}, settings.duration);
-                            currentPage++;
+
+                            scrollLeft();
+
                         }
 
                         function moveRight() {
@@ -86,9 +122,9 @@
                                 list.animate({ left: "-=" + dragDelta()}, settings.duration);
                                 return;
                             }
-                            var new_width = -1 * width * (currentPage - 1);
-                            list.animate({ left: -1 * width * (currentPage - 2)}, settings.duration);
-                            currentPage--;
+
+                            scrollRight();
+
                         }
 
                         function dragDelta() {
@@ -109,6 +145,21 @@
                             .html($(this).html());
                     list.append(li);
                 });
+
+
+                function scrollUp() {
+                    var new_width = -1 * height * currentPage;
+                    list.animate({ top: new_width }, settings.duration);
+                    currentPage++;
+                    settings.onShowPage();
+                }
+
+                function scrollDown() {
+                    var new_width = -1 * height * (currentPage - 2);
+                    list.animate({ top: new_width }, settings.duration);
+                    currentPage--;
+                    settings.onShowPage();
+                }
 
                 list.draggable({
                     axis: "y",
@@ -137,9 +188,9 @@
                                 list.animate({ top: "+=" + dragDelta()}, settings.duration);
                                 return;
                             }
-                            var new_width = -1 * height * currentPage;
-                            list.animate({ top: new_width}, settings.duration);
-                            currentPage++;
+
+                            scrollUp();
+
                         }
 
                         function moveDown() {
@@ -147,9 +198,9 @@
                                 list.animate({ top: "-=" + dragDelta()}, settings.duration);
                                 return;
                             }
-                            var new_width = -1 * height * (currentPage - 2);
-                            list.animate({ top: new_width}, settings.duration);
-                            currentPage--;
+
+                            scrollDown();
+
                         }
 
                         function dragDelta() {
@@ -168,6 +219,37 @@
             container.append(list);
 
             originalList.replaceWith(container);
+
+            this.getPageIndex = function () {
+                return currentPage - 1;
+            }
+
+            this.getPageCount = function () {
+                return pages.length;
+            }
+
+            this.flipForward = function () {
+                if (currentPage === pages.length) return;
+
+                if (settings.direction.toLowerCase() === "horizontal") {
+                    scrollLeft();
+                } else if (settings.direction.toLowerCase() === "vertical") {
+                    scrollUp();
+                }
+
+            }
+
+            this.flipBackward = function () {
+                if (currentPage === 1) return;
+
+                if (settings.direction.toLowerCase() === "horizontal") {
+                    scrollRight();
+                } else if (settings.direction.toLowerCase() === "vertical") {
+                    scrollDown();
+                }
+
+            }
+
         });
     };
 })(jQuery);
