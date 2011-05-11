@@ -63,10 +63,10 @@
 
             var currentPage = 1, start, stop;
             if (settings.direction.toLowerCase() === "horizontal") {
-                list.css({float: "left"});
+                list.css({cssFloat: "left" });
                 $.each(pages, function(i) {
                     var li = $("<li>")
-                            .css($.extend(listItemCss, {float: "left"}))
+                            .css($.extend(listItemCss, {cssFloat: "left" }))
                             .html($(this).html());
                     list.append(li);
                 });
